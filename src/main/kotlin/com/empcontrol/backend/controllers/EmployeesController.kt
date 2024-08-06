@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController
-@RequestMapping("/api/v1/employees")
+@RequestMapping("/employees")
 class EmployeesController(private val employeeService: EmployeeService) {
 
     @GetMapping
@@ -30,7 +30,7 @@ class EmployeesController(private val employeeService: EmployeeService) {
         return ResponseEntity.notFound().build()
     }
 
-    @GetMapping("/:employeeId")
+    @GetMapping("/{employeeId}")
     fun getEmployeeById(@PathVariable employeeId: Long): ResponseEntity<Employee> {
         val employee: Optional<Employee> = employeeService.findOneById(employeeId)
 
@@ -46,17 +46,18 @@ class EmployeesController(private val employeeService: EmployeeService) {
         return ResponseEntity.status(HttpStatus.CREATED).body(employee)
     }
 
-    @PutMapping("/:employeeId")
+    @PutMapping("/{employeeId}")
     fun updateEmployee(
-        @PathVariable employeeId: String,
-        @RequestBody @Valid updatedEmployee: EmployeeRequest): ResponseEntity<Employee> {
+        @PathVariable employeeId: Long,
+        @RequestBody @Valid updatedEmployee: EmployeeRequest
+    ): ResponseEntity<Employee> {
         val employee: Employee = employeeService.updateOneById(employeeId, updatedEmployee)
 
         return ResponseEntity.ok(employee)
     }
-    @PutMapping("/:employeeId/disable")
+    @PutMapping("/{employeeId}/disable")
     fun updateStatusById(
-        @PathVariable employeeId: String): ResponseEntity<Employee> {
+        @PathVariable employeeId: Long): ResponseEntity<Employee> {
         val employee: Employee = employeeService.disableEmployeeById(employeeId)
 
         return ResponseEntity.ok(employee)

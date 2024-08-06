@@ -2,10 +2,7 @@ package com.empcontrol.backend.model
 
 import com.empcontrol.backend.enums.EmployeeRoles
 import com.empcontrol.backend.enums.EmployeeStatus
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import java.time.LocalDate
-import java.util.*
 
 data class EmployeeResponse(
     var id: Long,
@@ -20,5 +17,4 @@ data class EmployeeResponse(
 
     var birthdate: LocalDate,
 
-    var audit: Audit
-)
+    )
