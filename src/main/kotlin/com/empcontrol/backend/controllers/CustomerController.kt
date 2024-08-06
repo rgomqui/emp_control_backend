@@ -27,9 +27,9 @@ class CustomerController(
     }
 
     @PostMapping("/login")
-    fun registerOneCustomer(@RequestBody @Valid loginRequest: LoginRequest): ResponseEntity<LoginResponse> {
+    fun login(@RequestBody @Valid loginRequest: LoginRequest): ResponseEntity<LoginResponse> {
         val savedCustomer = authService.login(loginRequest)
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedCustomer)
+        return ResponseEntity.ok(savedCustomer)
     }
 }

@@ -7,12 +7,16 @@ import com.empcontrol.backend.model.CustomerResponse
 import com.empcontrol.backend.model.LoginRequest
 import com.empcontrol.backend.model.LoginResponse
 import com.empcontrol.backend.services.CustomerService
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 
 @Service
 class AuthServiceImpl(
     private val customerService: CustomerService,
-    private val jwtService: JWTService
+    private val jwtService: JWTService,
+    private val authenticationManager: AuthenticationManager
 ): AuthService {
     override fun registerOneCostumer(newCustomer: CustomerRequest): CustomerResponse {
         val savedCustomer = customerService.registerOneCostumer(newCustomer)
@@ -25,12 +29,15 @@ class AuthServiceImpl(
     }
 
     override fun login(loginRequest: LoginRequest): LoginResponse {
-        val customerDB = customerService.login(loginRequest)
+
+        val authentication = UsernamePasswordAuthenticationToken(loginRequest.username, loginRequest.password)
+        authenticationManager.authenticate(authentication)
+
+        val customerDB: UserDetails = customerService.login(loginRequest)
             .orElseThrow{ EmployeeNotFoundException("Employee with id ${loginRequest.username} not found.") }
 
         if(customerDB.name.isEmpty()) throw EmployeeNotFoundException("Employee with id ${loginRequest.username} not found.")
         return LoginResponse(
-            username = customerDB.username,
             jwt = jwtService.generateToken(customerDB, generateExtraClaims(customerDB))
         )
     }
