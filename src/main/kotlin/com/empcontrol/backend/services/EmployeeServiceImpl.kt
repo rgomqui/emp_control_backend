@@ -5,7 +5,6 @@ import com.empcontrol.backend.enums.EmployeeStatus
 import com.empcontrol.backend.exception.EmployeeNotFoundException
 import com.empcontrol.backend.model.EmployeeRequest
 import com.empcontrol.backend.repository.EmployeeRepository
-import com.empcontrol.backend.services.EmployeeService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service

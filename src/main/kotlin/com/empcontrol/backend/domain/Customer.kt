@@ -7,20 +7,27 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 @Entity
-@Table(name = "\"user\"")
-class User(
+@Table(name = "customer")
+@SequenceGenerator(
+    name = "customer_seq",
+    sequenceName = "customer_sequence",
+    initialValue = 1000,
+    allocationSize = 1
+)
+class Customer(
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private var id: Long? = 0,
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_seq")
+    var id: Long? = 0,
 
+    @Column(unique = true)
     private var username: String,
 
-    private var name: String,
+    var name: String,
 
     private var password: String,
 
     @Enumerated(EnumType.STRING)
-    private var role: EmployeeRoles
+    var role: EmployeeRoles
 ): UserDetails
 {
 
