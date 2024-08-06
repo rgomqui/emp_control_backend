@@ -1,13 +1,11 @@
-# the base image
-FROM amazoncorretto:17
+FROM maven:3.8.4-openjdk-21-slim as build
+VOLUME /tmp
+COPY . /app
+WORKDIR /app
+RUN mvn clean package
 
-# the JAR file path
-ARG JAR_FILE=target/*.jar
-
-# Copy the JAR file from the build context into the Docker image
-COPY ${JAR_FILE} application.jar
-
-CMD apt-get update -y
-
-# Set the default command to run the Java application
-ENTRYPOINT ["java", "-Xmx2048M", "-jar", "/application.jar"]
+FROM eclipse-temurin:21-jdk-alpine as runner
+VOLUME /tmp
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app.jar"]

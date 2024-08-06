@@ -1,16 +1,24 @@
 package com.empcontrol.backend.model
 
+import com.empcontrol.backend.enums.EmployeeRoles
+import com.empcontrol.backend.enums.EmployeeStatus
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import java.time.LocalDate
 import java.util.*
 
 data class EmployeeResponse(
-    val id: UUID,
+    var id: Long,
 
-    val name: String,
+    var status: EmployeeStatus,
 
-    val surname: String,
+    var role: EmployeeRoles,
 
-    val birthdate: Date,
+    var name: String,
 
-    val audit: Audit
+    var surname: String,
 
+    var birthdate: LocalDate,
+
+    var audit: Audit
 )

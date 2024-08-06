@@ -7,9 +7,15 @@ services:
     restart: unless-stopped
 
     environment:
-      - POSTGRES_USER=employees_postgres
-      - POSTGRES_PASSWORD=P4ssW0rD_d3
-      - POSTGRES_DB=employees
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
+      - POSTGRES_DB=
     ports:
       - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
 
