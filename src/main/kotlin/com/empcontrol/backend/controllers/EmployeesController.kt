@@ -6,11 +6,9 @@ import com.empcontrol.backend.services.EmployeeService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -37,13 +35,6 @@ class EmployeesController(private val employeeService: EmployeeService) {
         if(employee.isPresent) return ResponseEntity.ok(employee.get())
 
         return ResponseEntity.notFound().build()
-    }
-
-    @PostMapping
-    fun createEmployee(@RequestBody @Valid newEmployee: EmployeeRequest): ResponseEntity<Employee> {
-        val employee: Employee = employeeService.createOne(newEmployee)
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(employee)
     }
 
     @PutMapping("/{employeeId}")

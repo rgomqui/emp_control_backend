@@ -1,6 +1,6 @@
 package com.empcontrol.backend.exception
 
-class EmployeeNotFoundException: RuntimeException {
+class ObjectNotFoundException: RuntimeException {
 
     constructor() : super("Employee not found")
 

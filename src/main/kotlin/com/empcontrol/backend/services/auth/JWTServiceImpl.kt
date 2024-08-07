@@ -1,5 +1,6 @@
 package com.empcontrol.backend.services.auth
 
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Header
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -8,8 +9,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.security.Key
-import java.time.LocalDate
 import java.util.Date
+import javax.crypto.SecretKey
 
 @Service
 class JWTServiceImpl(
@@ -19,22 +20,35 @@ class JWTServiceImpl(
     @Value("\${security.jwt.secret-key}")
     private val SECRET_KEY_TOKEN: String
 ): JWTService {
+    private val JWT_TYPE = "JWT"
+
     override fun generateToken(userDetails: UserDetails, extraClaims: Map<String, Any>): String {
         val issuedAt = Date()
+
         val expiration = Date((MINUTES_EXPIRATION_TOKEN * 60 * 1000) + issuedAt.time)
+
         val jwt = Jwts.builder()
             .claims(extraClaims)
             .subject(userDetails.username)
             .issuedAt(issuedAt)
             .expiration(expiration)
-            .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-            .signWith(generateKey(), SignatureAlgorithm.HS256)
+            .header().type(JWT_TYPE)
+            .and()
+            .signWith(generateKey(), Jwts.SIG.HS256)
             .compact()
 
         return jwt
     }
 
-    private fun generateKey(): Key? {
+    override fun extractUsername(jwt: String): String {
+        return extractAllClaims(jwt).subject
+    }
+
+    private fun extractAllClaims(jwt: String): Claims {
+        return Jwts.parser().verifyWith(generateKey()).build().parseSignedClaims(jwt).payload
+    }
+
+    private fun generateKey(): SecretKey? {
         return Keys.hmacShaKeyFor(SECRET_KEY_TOKEN.toByteArray())
     }
 }
