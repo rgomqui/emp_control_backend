@@ -1,15 +1,15 @@
 package com.empcontrol.backend.model
 
-import com.empcontrol.backend.enums.EmployeeRoles
-import com.empcontrol.backend.enums.EmployeeStatus
+import com.empcontrol.backend.enums.UserRolesEnum
+import com.empcontrol.backend.enums.UserStatus
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.Size
 import java.time.LocalDate
 
-data class EmployeeRequest(
-    var status: EmployeeStatus,
+data class UserRequest(
+    var status: UserStatus,
 
-    var role: EmployeeRoles,
+    var role: String,
 
     var name: String,
 

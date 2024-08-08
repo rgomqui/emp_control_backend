@@ -1,6 +1,6 @@
 package com.empcontrol.backend.configuration.extra
 
-import com.empcontrol.backend.services.EmployeeService
+import com.empcontrol.backend.services.UserService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.info.Info
 import org.springframework.boot.actuate.info.InfoContributor
@@ -21,10 +21,10 @@ class InfoCustom(
     @Value("\${app.version}")
     private val APP_VERSION: String,
 
-    private val employeeService: EmployeeService
+    private val userService: UserService
 ): InfoContributor {
     override fun contribute(builder: Info.Builder?) {
-        val usersRegistered =employeeService.findAll(PageRequest.of(0, 1)).totalElements
+        val usersRegistered =userService.findAll(PageRequest.of(0, 1)).totalElements
 
         builder?.withDetails( mapOf(
             "app" to mapOf(

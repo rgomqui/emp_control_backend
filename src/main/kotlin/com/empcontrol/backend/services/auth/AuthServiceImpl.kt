@@ -1,38 +1,37 @@
 package com.empcontrol.backend.services.auth
 
-import com.empcontrol.backend.domain.Employee
+import com.empcontrol.backend.domain.User
 import com.empcontrol.backend.exception.ObjectNotFoundException
-import com.empcontrol.backend.model.EmployeeRequest
-import com.empcontrol.backend.model.EmployeeResponse
+import com.empcontrol.backend.model.UserRequest
+import com.empcontrol.backend.model.UserResponse
 import com.empcontrol.backend.model.LoginRequest
 import com.empcontrol.backend.model.LoginResponse
-import com.empcontrol.backend.services.EmployeeService
+import com.empcontrol.backend.services.UserService
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import kotlin.concurrent.thread
 
 @Service
 class AuthServiceImpl(
-    private val employeeService: EmployeeService,
+    private val userService: UserService,
     private val jwtService: JWTService,
     private val authenticationManager: AuthenticationManager,
     private val passwordEncoder: PasswordEncoder
     ): AuthService {
 
-    override fun registerOne(newEmployee: EmployeeRequest): EmployeeResponse {
-        val savedEmployee = employeeService.registerOne(newEmployee)
+    override fun registerOne(newUser: UserRequest): UserResponse {
+        val savedUser= userService.registerOne(newUser)
 
-        return EmployeeResponse(
-            id = savedEmployee.id!!,
-            name = savedEmployee.name,
-            username = savedEmployee.username,
-            role = savedEmployee.role,
-            status = savedEmployee.status,
-            birthdate = savedEmployee.birthdate
+        return UserResponse(
+            id = savedUser.id!!,
+            name = savedUser.name,
+            username = savedUser.username,
+            role = savedUser.role,
+            status = savedUser.status,
+            birthdate = savedUser.birthdate
         )
     }
 
@@ -41,26 +40,26 @@ class AuthServiceImpl(
         val authentication = UsernamePasswordAuthenticationToken(loginRequest.username, loginRequest.password)
         authenticationManager.authenticate(authentication)
 
-        val user: UserDetails = employeeService.findOneByUsername(loginRequest.username).get()
+        val user: UserDetails = userService.findOneByUsername(loginRequest.username).get()
 
         if(user.username.isEmpty()) throw ObjectNotFoundException("Employee with id ${loginRequest.username} not found.")
         return LoginResponse(
-            jwt = jwtService.generateToken(user, generateExtraClaims(user as Employee))
+            jwt = jwtService.generateToken(user, generateExtraClaims(user as User))
         )
     }
 
-    override fun generateExtraClaims(employee: Employee?): Map<String, Any> {
-        var extraClaims: Map<String, Any> = hashMapOf(
-            "role" to employee!!.role.name,
-            "name" to employee.name,
-            "authorities" to employee.authorities,
-            "status" to employee.status,
+    override fun generateExtraClaims(user: User?): Map<String, Any> {
+        val extraClaims: Map<String, Any> = hashMapOf(
+            "role" to user!!.role.name,
+            "name" to user.name,
+            "authorities" to user.authorities,
+            "status" to user.status,
         )
 
         return extraClaims
     }
 
-    override fun validatePassword(newEmployee: EmployeeRequest) {
+    override fun validatePassword(newEmployee: UserRequest) {
         TODO("Not yet implemented")
     }
 
@@ -74,12 +73,12 @@ class AuthServiceImpl(
         }
     }
 
-    override fun findLoggedInEmployee(): Employee {
+    override fun findLoggedInEmployee(): User {
         val auth = SecurityContextHolder.getContext().authentication
 
         if(auth is UsernamePasswordAuthenticationToken ) {
             val username = auth.principal.toString()
-            return employeeService.findOneByUsername(username).orElseThrow { ObjectNotFoundException("User $username not found. ") }
+            return userService.findOneByUsername(username).orElseThrow { ObjectNotFoundException("User $username not found. ") }
         }
 
         throw ObjectNotFoundException("User not logged in. ")

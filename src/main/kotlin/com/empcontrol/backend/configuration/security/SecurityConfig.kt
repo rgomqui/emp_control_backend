@@ -1,9 +1,13 @@
 package com.empcontrol.backend.configuration.security
 
-import com.empcontrol.backend.configuration.filter.JwtAuthFilter
-import com.empcontrol.backend.enums.RolePermissions
+import com.empcontrol.backend.configuration.security.authorization.CustomAuthorizationManager
+import com.empcontrol.backend.configuration.security.filter.JwtAuthFilter
+import com.empcontrol.backend.configuration.security.handler.CustomAccessDeniedHandler
+import com.empcontrol.backend.configuration.security.handler.CustomAuthenticationEntrypoint
+import com.empcontrol.backend.enums.UserRolesEnum
+import com.empcontrol.backend.enums.RolePermissionsEnum
 import com.empcontrol.backend.exception.ObjectNotFoundException
-import com.empcontrol.backend.repository.EmployeeRepository
+import com.empcontrol.backend.repository.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -22,9 +26,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+//@EnableMethodSecurity(
+//    prePostEnabled = true
+//)
 class SecurityConfig(
-    private val employeeRepository: EmployeeRepository,
-    private val jwtAuthFilter: JwtAuthFilter
+    private val userRepository: UserRepository,
+    private val jwtAuthFilter: JwtAuthFilter,
+    private val customAuthenticationEntrypoint: CustomAuthenticationEntrypoint,
+    private val customAccessDeniedHandler: CustomAccessDeniedHandler,
+    private val customAuthorizationManager: CustomAuthorizationManager
 ) {
 
     @Bean
@@ -35,13 +45,17 @@ class SecurityConfig(
             .sessionManagement { SessionCreationPolicy.STATELESS }
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
-            .authorizeHttpRequests { it.requestMatchers(HttpMethod.POST,"/auth/**").permitAll() }
-            .authorizeHttpRequests { it.requestMatchers(HttpMethod.GET, "/auth/**").permitAll() }
-            .authorizeHttpRequests { it.requestMatchers(HttpMethod.GET, "/employees").hasAuthority(RolePermissions.READ_ALL_EMPLOYEES.name) }
-            .authorizeHttpRequests { it.requestMatchers(HttpMethod.GET, "/employees/{employeeId}").hasAuthority(RolePermissions.READ_ONE_EMPLOYEE.name) }
-            .authorizeHttpRequests { it.requestMatchers(HttpMethod.PUT, "/employees/{employeeId}").hasAuthority(RolePermissions.UPDATE_ONE_EMPLOYEE.name) }
-            .authorizeHttpRequests { it.requestMatchers(HttpMethod.PUT, "/employees/{employeeId}/disable").hasAuthority(RolePermissions.DISABLE_ONE_EMPLOYEE.name) }
-            .authorizeHttpRequests { it.anyRequest().permitAll() }
+            .exceptionHandling{ it.authenticationEntryPoint(customAuthenticationEntrypoint)}
+            .exceptionHandling{ it.accessDeniedHandler(customAccessDeniedHandler)}
+//            .authorizeHttpRequests { it.requestMatchers("/auth/**").permitAll() }
+//            .authorizeHttpRequests { it.requestMatchers("/auth/profile").authenticated() }
+//            [*] Authorization role and permissions based [*]
+//            .authorizeHttpRequests { it.requestMatchers(HttpMethod.GET, "/employees").hasAnyRole(UserRolesEnum.ADMIN.name) }
+//            .authorizeHttpRequests { it.requestMatchers(HttpMethod.GET, "/employees/{employeeId}").hasAnyRole(UserRolesEnum.ADMIN.name, UserRolesEnum.USER.name) }
+//            .authorizeHttpRequests { it.requestMatchers(HttpMethod.PUT, "/employees/{employeeId}").hasAuthority(RolePermissionsEnum.UPDATE_ONE_EMPLOYEE.name) }
+//            .authorizeHttpRequests { it.requestMatchers(HttpMethod.PUT, "/employees/{employeeId}/disable").hasAuthority(RolePermissionsEnum.DISABLE_ONE_EMPLOYEE.name) }
+//            [*] Authorization role and permissions based [*]
+            .authorizeHttpRequests { it.anyRequest().access(customAuthorizationManager) }
 
         return http.build()
     }
@@ -64,7 +78,7 @@ class SecurityConfig(
     @Bean
     fun userDetailsService(): UserDetailsService {
         return UserDetailsService { username ->
-            employeeRepository.findByUsername(username).orElseThrow {
+            userRepository.findByUsername(username).orElseThrow {
                 ObjectNotFoundException("User $username not found.")
             }
         }

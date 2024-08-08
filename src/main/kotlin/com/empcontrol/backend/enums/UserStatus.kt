@@ -1,5 +1,5 @@
 package com.empcontrol.backend.enums
 
-enum class EmployeeStatus {
+enum class UserStatus {
     ACTIVE, INACTIVE
 }

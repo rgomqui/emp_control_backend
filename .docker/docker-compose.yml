@@ -4,12 +4,14 @@ services:
   db:
     container_name: employees_db
     image: postgres:12.19
+    env_file: ./.env
     restart: unless-stopped
-
+#    volumes:
+#      - ../src/main/resources/import.sql:/docker-entrypoint-initdb.d/import.sql
     environment:
-      - POSTGRES_USER=
-      - POSTGRES_PASSWORD=
-      - POSTGRES_DB=
+      - POSTGRES_USER=employees_postgres
+      - POSTGRES_PASSWORD=P4ssW0rD_d3
+      - POSTGRES_DB=employees
     ports:
       - 5432:5432
 

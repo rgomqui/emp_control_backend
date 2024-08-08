@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.ExceptionHandler
 import java.security.Key
 import java.util.Date
 import javax.crypto.SecretKey

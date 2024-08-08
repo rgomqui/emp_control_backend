@@ -1,7 +1,7 @@
-package com.empcontrol.backend.configuration.filter
+package com.empcontrol.backend.configuration.security.filter
 
 import com.empcontrol.backend.exception.ObjectNotFoundException
-import com.empcontrol.backend.repository.EmployeeRepository
+import com.empcontrol.backend.repository.UserRepository
 import com.empcontrol.backend.services.auth.JWTService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -14,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Component
 class JwtAuthFilter(
     private val jwtService: JWTService,
-    private val employeeRepository: EmployeeRepository
+    private val userRepository: UserRepository
 ): OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -32,7 +32,7 @@ class JwtAuthFilter(
 
         val username = jwtService.extractUsername(jwt)
 
-        val user = employeeRepository.findByUsername(username).orElseThrow{ ObjectNotFoundException("Employee $username not found.") }
+        val user = userRepository.findByUsername(username).orElseThrow{ ObjectNotFoundException("Employee $username not found.") }
 
         val usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(username, null, user.authorities)
 

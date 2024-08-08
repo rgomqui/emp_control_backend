@@ -1,6 +1,6 @@
 package com.empcontrol.backend.enums
 
-enum class RolePermissions {
+enum class RolePermissionsEnum {
     READ_ALL_EMPLOYEES,
     READ_ONE_EMPLOYEE,
     WRITE_ONE_EMPLOYEE,
