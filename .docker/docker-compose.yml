@@ -1,0 +1,21 @@
+version: "3.1"
+
+services:
+  db:
+    container_name: employees_db
+    image: postgres:12.19
+    restart: unless-stopped
+
+    environment:
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
+      - POSTGRES_DB=
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
+
